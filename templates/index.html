@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .chat-container { max-width: 600px; margin: auto; }
+        .messages { border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: scroll; }
+        .message { margin: 5px 0; }
+        .user { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <input type="text" id="input" placeholder="Type a message" onkeydown="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('input');
+            const message = input.value;
+            if (!message) return;
+            
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<div class="message user">You: ${message}</div>`;
+            input.value = '';
+            
+            const response = await fetch('http://localhost:5000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            
+            const data = await response.json();
+            messagesDiv.innerHTML += `<div class="message">Bot: ${data.response}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
